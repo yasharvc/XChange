@@ -1,0 +1,46 @@
+﻿@model XChange.Areas.Manage.ViewModels.SellerReportViewModel
+@using XChange.Areas.Manage.ViewModels
+@{
+    ViewBag.Title = "گزارش فروش ارز";
+}
+<table class="w3-table w3-bordered w3-striped w3-border test w3-hoverable w3-right-align w3-right">
+	<tbody>
+		<tr class="w3-green">
+			<th class="w3-center">تاریخ - زمان</th>
+			<th class="w3-center">کاربر</th>
+			<th class="w3-center">نوع ارز</th>
+			<th class="w3-center">عملیات</th>
+			<th class="w3-center">مقدار ارز</th>
+			<th class="w3-center">قیمت ارز</th>
+			<th class="w3-center">معادل ريالی</th>
+		</tr>
+	</tbody>
+	<tbody>
+		@foreach (var row in Model.CashAccountingRows)
+		{
+		<tr>
+			<td class="w3-center">
+				@row.CashAccounting.ShamsiDate - @row.CashAccounting.Time
+			</td>
+			<td class="w3-center">
+				@row.User.FullName
+			</td>
+			<td class="w3-center">
+				@row.Currency.Name
+			</td>
+			<td class="w3-center">
+				@row.CashOperation.Description
+			</td>
+			<td class="w3-center @(row.IsPositiveOperation() ? "w3-text-green" : "w3-text-red")">
+				@((float)row.CashAccounting.Value) (@Html.Raw(row.GetArrowWithW3CSS()))
+			</td>
+			<td class="w3-center">
+				@((float)row.CashAccounting.CurrencyValueInRial)
+			</td>
+			<td class="w3-center @(row.IsPositiveOperation() ? "w3-text-green" : "w3-text-red")">
+				@((float)(row.CashAccounting.Value * row.CashAccounting.CurrencyValueInRial)) (@Html.Raw(row.GetArrowWithW3CSS()))
+			</td>
+		</tr>
+		}
+	</tbody>
+</table>

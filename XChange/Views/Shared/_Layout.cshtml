@@ -1,0 +1,52 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>@ViewBag.Title</title>
+	<link href="~/Content/css/general/w3.css" rel="stylesheet" />
+	<link href="~/Content/css/rtl/style.css" rel="stylesheet" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="w3-theme-l5" dir="rtl">
+@{ 
+	Html.RenderPartial("_Navbar");
+}
+	<!-- Page Container -->
+	<div class="w3-container w3-content" style="max-width:1400px;margin-top:80px">
+		@RenderBody()
+	</div>
+	<br>
+
+	<!-- Footer -->
+	<footer class="w3-container w3-theme-d3 w3-padding-16" style="bottom:0;position:absolute;width:100%;">
+		<h5>Footer</h5>
+	</footer>
+
+	<script>
+		// Accordion
+		function myFunction(id) {
+			var x = document.getElementById(id);
+			if (x.className.indexOf("w3-show") == -1) {
+				x.className += " w3-show";
+				x.previousElementSibling.className += " w3-theme-d1";
+			} else {
+				x.className = x.className.replace("w3-show", "");
+				x.previousElementSibling.className =
+					x.previousElementSibling.className.replace(" w3-theme-d1", "");
+			}
+		}
+
+		// Used to toggle the menu on smaller screens when clicking on the menu button
+		function openNav() {
+			var x = document.getElementById("navDemo");
+			if (x.className.indexOf("w3-show") == -1) {
+				x.className += " w3-show";
+			} else {
+				x.className = x.className.replace(" w3-show", "");
+			}
+		}
+	</script>
+	<script src="~/Content/js/zepto.min.js"></script>
+</body>
+</html>

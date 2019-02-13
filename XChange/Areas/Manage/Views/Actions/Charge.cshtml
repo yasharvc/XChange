@@ -1,0 +1,120 @@
+﻿@model XChange.Areas.Manage.ViewModels.ChargeViewModel
+@{
+	ViewBag.Title = "شارژ صندوق";
+}
+
+<div class="w3-card-4">
+	<div class="w3-container w3-green">
+		<h2 class="w3-right">اطلاعات شارژ صندوق</h2>
+		<i class="w3-left fa fa-spin fa-spinner fa-3x w3-centered" style="display:none;" id="loading"></i>
+	</div>
+	<div class="w3-container">
+		<div class="w3-row w3-margin" style="direction:rtl;">
+			<div class="w3-col m3">
+				<label for="currWorth">ارزش ارز به ریال:</label>
+				<input type="number" class="w3-input w3-border" id="currWorth" placeholder="ارزش ارز انتخاب شده به ریال ..." />
+			</div>
+			<div class="w3-col m3">
+				<label for="price">مبلغ:</label>
+				<input type="number" class="w3-input w3-border" id="price" />
+			</div>
+			<div class="w3-col m3">
+				<label for="currency">نوع ارز:</label>
+				<select class="js-example-basic-single js-states" id="currency" style="width: 100%">
+					@foreach (var currency in Model.Currencies)
+					{
+						<option value="@currency.ID">@currency.Name</option>
+					}
+				</select>
+			</div>
+			<div class="w3-col m3">
+				<label for="cash">صندوق:</label>
+				<select class="js-example-basic-single js-states" id="cash" style="width: 100%">
+					@foreach (var cash in Model.Cashes)
+					{
+						<option value="@cash.ID">@cash.Name</option>
+					}
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class="w3-container w3-light-gray w3-center">
+		<button class="w3-btn w3-blue w3-main" type="button" onclick="chargeCash()"><i class="fa fa-save"></i> ثبت</button>
+	</div>
+</div>
+@section scripts{
+	<script>
+		var cash = $('#cash').select2({ width: 'resolve', placeholder: 'صندوق موردنظرتان را انتخاب کنید...'})
+			.val('undefined')
+			.trigger('change');
+		cash.data('select2').$selection.css('height', '40px');
+		var currency = $('#currency').select2({ width: 'resolve', placeholder: 'ارز موردنظرتان را انتخاب کنید...' })
+			.val('undefined')
+			.trigger('change');
+		currency.data('select2').$selection.css('height', '40px');
+	</script>
+	<script>
+		function showLoading() {
+			$('#loading').fadeIn();
+		}
+		function hideLoading() {
+			$('#loading').fadeOut();
+		}
+		function chargeCash() {
+			showLoading();
+			var cashID = $('#cash').val();
+			var currencyID = $('#currency').val();
+			var price = parseFloat($('#price').val());
+			var currWorth = parseFloat($('#currWorth').val());
+			var errorList = '<ul>';
+			var hasError = false;
+			if (typeof cashID == 'undefined' || cashID == null) {
+				errorList += "<li>صندوق انتخاب نشده است</li>";
+				hasError = true;
+			}
+			if (typeof currencyID == 'undefined' || currencyID == null) {
+				errorList += "<li>ارز موردنظر انتخاب نشده است</li>";
+				hasError = true;
+			}
+			if (isNaN(price)) {
+				errorList += "<li>مبلغ وارد نشده است</li>";
+				hasError = true;
+			}
+			if (isNaN(currWorth)) {
+				errorList += "<li>ارزش ارز به ريال وارد نشده است</li>";
+				hasError = true;
+			}
+			if (hasError) {
+				errorList += '</ul>';
+				showErrors('خطاهای زیر را تصحیح نمایید', errorList);
+				hideLoading();
+			} else {
+				$.post({
+					url: '/Manage/Actions/Charge',
+					data: {
+						cashID: cashID,
+						currencyID: currencyID,
+						price: price,
+						currWorth: currWorth
+					},
+					success: function (data) {
+						if (data.result) {
+							successSnack('صندوق با موفقیت شارژ شد');
+							cash.val('undefined').trigger('change');
+							currency.val('undefined').trigger('change');
+							$('#price').val('');
+							$('#currWorth').val('');
+						} else {
+							for (var i = 0; i < data.errors.length; i++) {
+								errorList += "<li>" + data.errors[i].Description + "</li>";
+							}
+							errorList += '</ul>';
+							showErrors('خطاهای زیر را تصحیح نمایید', errorList);
+						}
+						hideLoading();
+					}
+				});
+			}
+		}
+	</script>
+}
